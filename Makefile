@@ -1,7 +1,7 @@
 TARGET1=server
 TARGET2=client
 OBJ1+=server.o
-OBJ2+=client.0
+OBJ2+=client.o
 
 TARGETS=$(TARGET1) $(TARGET2)
 OBJS=$(OBJ1) $(OBJ2)
