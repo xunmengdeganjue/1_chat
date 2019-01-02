@@ -12,8 +12,8 @@ void code1(){
 }
 
 void code3(){
-
-
+	/*C5:修改Code3*/
+	
 }
 
 
