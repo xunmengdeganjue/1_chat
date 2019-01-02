@@ -5,6 +5,7 @@
 #include <netinet/in.h>
 #define SERVER_PORT 6666
 
+
 int main(int argc ,char **argv)
 {
  int client_socketfd; //客户端套接字 
