@@ -5,23 +5,39 @@
 #include <libubox/uloop.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include<fcntl.h>
+#include<unistd.h>
 
 #include "server.h"
 #include "logopt.h"
-
+#include "common.h"
 
 int socket_fd ;
 struct uloop_fd ul_fd;
+
+static void show_message( const char *msg){
+
+	printf("Server:%s\n",msg);
+
+}
+
+static void send_message( const char *msg){
+	int msg_len = 0;
+	
+	if(msg==NULL){
+		trace_err("The message is Null!\n");
+	}
+	msg_len = send(socket_fd,msg,strlen(msg),0);//发送信息
+	if(msg_len < 0){
+		trace_err("Message send failed!\n");
+	}
+}
 
 int message_recv(struct uloop_fd *u, unsigned int events){
 	char buf[MSG_SIZE] = {0};
 	if( events & ULOOP_READ){
 		if(recv( u->fd, buf, sizeof(buf), 0) > 0){
-			trace_info("recv_buf:%s\n", buf);
-			int send_len = 0;
-			fgets(buf,sizeof(buf),stdin);/*这种方法获取带有空格的字串比较可靠*/
-			trace_info("get the message from the table!\n");
-			send_len = send(u->fd,buf,sizeof(buf),0); 
+			show_message(buf);
 		}else{
 			trace_err("receive error!\n");
 		}
@@ -62,13 +78,34 @@ static void cleanup_env(){
 	
 
 }
+void for_input (  )
+{
+	char message[128] = {0};
+	fgets(message,sizeof(message),stdin);
+	if(message[0] != 0){
+		printf("You have input the content:%s\n",message);
+		send_message(message);
+	}
+}
+
+//设置输入时发送信号，设置输入为O_ASYNC
+void enable_kdb_signals()
+{
+	int fd_flags;
+	fcntl(0,F_SETOWN,getpid());
+	fd_flags = fcntl(0,F_GETFL);
+	fcntl(0,F_SETFL,(fd_flags|O_ASYNC));
+}
+
+
 int main(int argc ,char **argv)
 {
 
 	uloop_init();
 	server_init();
 	uloop_fd_init();
-	
+	signal(SIGIO,for_input);
+	enable_kdb_signals();//设置输入时发送信号，设置输入为O_ASYNC
 	uloop_run();
 
 	uloop_done();
