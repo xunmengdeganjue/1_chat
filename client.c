@@ -16,10 +16,6 @@ void code2(){
 
 }
 
-void code3(){
-
-
-}
 
 
 
