@@ -7,7 +7,7 @@
 
 /*git branch test code:*/
 void code1(){
-
+	/*C2:添加测试内容;*/
 
 }
 
