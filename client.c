@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <string.h>
 
@@ -40,7 +41,6 @@ static int server_init(){
 	if(socket_fd < 0){
 		printf("create the socket failed!\n");
 	} 
-
 	/*配置socket*/
 	bzero(&addr, sizeof(addr)); 
 	addr.sin_family = AF_INET;  /*设置成IP通信*/
@@ -74,5 +74,6 @@ int main(int argc ,char **argv)
 	uloop_done();
 	
 	cleanup_env();
+
 	return 0;
 }
