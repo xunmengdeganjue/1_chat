@@ -5,13 +5,6 @@
 #include <netinet/in.h>
 #define SERVER_PORT 6666
 
-/*git branch test code:*/
-void code1(){
-	/*C0:添加测试内容;*/
-
-}
-
-
 int main(int argc ,char **argv)
 {
 	int client_socketfd; //客户端套接字 
