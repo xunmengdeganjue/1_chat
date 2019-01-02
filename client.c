@@ -11,13 +11,6 @@ void code1(){
 
 }
 
-void code2(){
-	/*C2:修改code2*/
-
-}
-
-
-
 
 int main(int argc ,char **argv)
 {
