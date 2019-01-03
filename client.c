@@ -1,7 +1,11 @@
+/*
+	chat for socket coding test.
+*/
 
 #include "client.h"
 
 CLIENT_INFO *client_info;
+
 static void show_message( const char *msg){
 
 	printf("Message from Server:\n\033[32m%s\033[0m\n",msg);
@@ -30,6 +34,7 @@ int message_recv(struct uloop_fd *u, unsigned int events){
 			trace_err("receive error!\n");
 		}
 	}
+	return 0;
 }
 static void uloop_ufd_add(int socket_fd){
 	client_info->ulfd.fd = socket_fd;
@@ -67,13 +72,14 @@ static void client_init(){
 	uloop_ufd_add(client_info->socket_fd);
 
 }
+
 static void cleanup_env(){
 	
 	close(client_info->socket_fd);
 	
 
 }
-void for_input (  )
+void client_for_input (  )
 {
 	char message[128] = {0};
 	fgets(message,sizeof(message),stdin);
@@ -98,12 +104,12 @@ int main(int argc ,char **argv)
 
 	uloop_init();
 	client_init();
-	signal(SIGIO,for_input);
+	signal(SIGIO, client_for_input);
 	enable_kdb_signals();//设置输入时发送信号，设置输入为O_ASYNC
+	
 	uloop_run();
 
 	uloop_done();
-	
 	cleanup_env();
 
 	return 0;
