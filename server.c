@@ -20,7 +20,7 @@ SERVER_INFO *server_info;
 
 static void show_message( const char *msg){
 
-	printf("Client:%s\n",msg);
+	printf("Message from Client:\n\033[32m%s\033[0m\n",msg);
 
 }
 static void client_message_deal(struct uloop_fd *u, unsigned int events){
@@ -29,7 +29,7 @@ static void client_message_deal(struct uloop_fd *u, unsigned int events){
 
 	if(events & ULOOP_READ){
 		if(recv( u->fd, buf, sizeof(buf), 0) > 0){
-			trace_info("recv_buf:%s\n", buf);
+			//trace_info("recv_buf:%s\n", buf);
 			show_message(buf);
 		}
 	}
