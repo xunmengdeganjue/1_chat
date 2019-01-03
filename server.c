@@ -72,7 +72,7 @@ static int connect_init(){
 	client_len = sizeof(struct sockaddr_in);
 	
 	/*等待客户端连接请求到达*/ 
-	client_socketfd = accept(server_socketfd, (struct sockaddr *)&client_add, &client_len);
+	client_socketfd = accept(server_socketfd, (struct sockaddr *)&client_add, (socklen_t *)&client_len);
 	if(client_socketfd > 0){
 		int send_len=0;
 			send_len=send(client_socketfd,message,mesge_send_len,0);//发送信息

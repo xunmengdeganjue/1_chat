@@ -25,7 +25,7 @@ static void send_message( const char *msg){
 	}
 }
 
-int message_recv(struct uloop_fd *u, unsigned int events){
+static void message_recv(struct uloop_fd *u, unsigned int events){
 	char buf[MSG_SIZE] = {0};
 	if( events & ULOOP_READ){
 		if(recv( u->fd, buf, sizeof(buf), 0) > 0){
@@ -34,7 +34,6 @@ int message_recv(struct uloop_fd *u, unsigned int events){
 			trace_err("receive error!\n");
 		}
 	}
-	return 0;
 }
 static void uloop_ufd_add(int socket_fd){
 	client_info->ulfd.fd = socket_fd;
