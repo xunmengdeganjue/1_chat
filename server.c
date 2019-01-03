@@ -39,7 +39,7 @@ static int connect_init(){
 	struct sockaddr_in server_addr;//服务器网络地址结构体 
 	struct sockaddr_in client_add;//客户端网络地址结构体	
 	//int addr_len = sizeof(server_addr);
-	int client_len = sizeof(struct sockaddr);  ;
+	int client_len = 0 ;
 	//int mesge_len = 0;
 	char message[1024]={"Welcom!"};
 	
@@ -69,8 +69,7 @@ static int connect_init(){
 	}
 
 	int mesge_send_len = strlen(message);
-	//client_len = sizeof(struct sockaddr_in);
-	
+	client_len = sizeof(struct sockaddr_in);
 	
 	/*等待客户端连接请求到达*/ 
 	client_socketfd = accept(server_socketfd, (struct sockaddr *)&client_add, &client_len);
@@ -78,7 +77,6 @@ static int connect_init(){
 		int send_len=0;
 			send_len=send(client_socketfd,message,mesge_send_len,0);//发送信息
 			printf("send lenght is:%d\n",send_len); //if the send_len is equal to the mesge_send_len,means the sending is successfully.
-			//close(server_socketfd);	
 
 	}
 	return client_socketfd;
