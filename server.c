@@ -3,18 +3,8 @@
 
 **/
 
-#include <stdio.h>
-#include <sys/socket.h>
-#include <string.h>
-#include <netinet/in.h>
-#include <libubox/uloop.h>
-#include<fcntl.h>
-#include<unistd.h>
+#include "server.h"
 
-#include "common.h"
-#include "logopt.h"
-
-//char message[1024] = {0};
 
 SERVER_INFO *server_info;
 
@@ -29,7 +19,7 @@ static void client_message_deal(struct uloop_fd *u, unsigned int events){
 
 	if(events & ULOOP_READ){
 		if(recv( u->fd, buf, sizeof(buf), 0) > 0){
-			trace_info("recv_buf:%s\n", buf);
+			//trace_info("recv_buf:%s\n", buf);
 			show_message(buf);
 		}
 	}
@@ -48,9 +38,9 @@ static int connect_init(){
 	int client_socketfd;//客户端套接字
 	struct sockaddr_in server_addr;//服务器网络地址结构体 
 	struct sockaddr_in client_add;//客户端网络地址结构体	
-	int addr_len = sizeof(server_addr);
-	int client_len = 0;
-	int mesge_len = 0;
+	//int addr_len = sizeof(server_addr);
+	int client_len = sizeof(struct sockaddr);  ;
+	//int mesge_len = 0;
 	char message[1024]={"Welcom!"};
 	
 	/*创建服务器端套接字--IPv4协议，面向连接通信，UDP协议*/  
@@ -79,20 +69,24 @@ static int connect_init(){
 	}
 
 	int mesge_send_len = strlen(message);
-	client_len = sizeof(struct sockaddr_in);
-	/*等待客户端连接请求到达*/ 
-	client_socketfd = accept(server_socketfd,(struct sockaddr *)&client_add,&client_len);
-
+	//client_len = sizeof(struct sockaddr_in);
 	
-	int send_len=0;
-	send_len=send(client_socketfd,message,mesge_send_len,0);//发送信息
-	printf("send lenght is:%d\n",send_len); //if the send_len is equal to the mesge_send_len,means the sending is successfully.
+	
+	/*等待客户端连接请求到达*/ 
+	client_socketfd = accept(server_socketfd, (struct sockaddr *)&client_add, &client_len);
+	if(client_socketfd > 0){
+		int send_len=0;
+			send_len=send(client_socketfd,message,mesge_send_len,0);//发送信息
+			printf("send lenght is:%d\n",send_len); //if the send_len is equal to the mesge_send_len,means the sending is successfully.
+			//close(server_socketfd);	
 
+	}
 	return client_socketfd;
+	
 
 }
 
-static int server_init(){
+static void server_init(){
 
 	server_info = (SERVER_INFO *)malloc(sizeof(SERVER_INFO));
 	server_info->socket_fd = connect_init();
@@ -115,7 +109,7 @@ void for_input (  )
 	char message[128] = {0};
 	fgets(message,sizeof(message),stdin);
 	if(message[0] != 0){
-		printf("You have input the content:%s\n",message);
+		printf("You have input the content:\n\033[32m%s\033[0m\n",message);
 		send_message(message);
 	}
 }
