@@ -1,39 +1,31 @@
+/*
+	chat for socket coding test.
+*/
 
-#include <stdio.h>
-#include <string.h>
+#include "client.h"
 
-#include <libubox/uloop.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include<fcntl.h>
-#include<unistd.h>
-
-#include "server.h"
-#include "logopt.h"
-#include "common.h"
-
-int socket_fd ;
-struct uloop_fd ul_fd;
+CLIENT_INFO *client_info;
 
 static void show_message( const char *msg){
 
-	printf("Server:%s\n",msg);
+	printf("Message from Server:\n\033[32m%s\033[0m\n",msg);
 
 }
 
 static void send_message( const char *msg){
 	int msg_len = 0;
 	
-	if(msg==NULL){
+	if(msg==NULL || msg[0] == '\n'){
 		trace_err("The message is Null!\n");
+		return ;
 	}
-	msg_len = send(socket_fd,msg,strlen(msg),0);//发送信息
+	msg_len = send(client_info->socket_fd,msg,strlen(msg),0);//发送信息
 	if(msg_len < 0){
 		trace_err("Message send failed!\n");
 	}
 }
 
-int message_recv(struct uloop_fd *u, unsigned int events){
+static void message_recv(struct uloop_fd *u, unsigned int events){
 	char buf[MSG_SIZE] = {0};
 	if( events & ULOOP_READ){
 		if(recv( u->fd, buf, sizeof(buf), 0) > 0){
@@ -43,16 +35,17 @@ int message_recv(struct uloop_fd *u, unsigned int events){
 		}
 	}
 }
-static void uloop_fd_init(){
-	ul_fd.fd = socket_fd;
-	ul_fd.cb = message_recv;
-	ul_fd.registered = false;
-	ul_fd.flags = ULOOP_READ;
-	uloop_fd_add(&ul_fd, ULOOP_READ);
+static void uloop_ufd_add(int socket_fd){
+	client_info->ulfd.fd = socket_fd;
+	client_info->ulfd.cb = message_recv;
+	client_info->ulfd.registered = false;
+	client_info->ulfd.flags = ULOOP_READ;
+	uloop_fd_add(&client_info->ulfd, ULOOP_READ);
 
 }
-static int server_init(){
+static int connect_init(){
 	struct sockaddr_in addr;
+	int socket_fd = -1;
 	socket_fd = socket(AF_INET,SOCK_STREAM,0);
 	if(socket_fd < 0){
 		printf("create the socket failed!\n");
@@ -70,15 +63,22 @@ static int server_init(){
 		printf("bind error\n");  
 		return -1;  
 	} 
-	
+	return socket_fd;
 }
+static void client_init(){
+	client_info = (CLIENT_INFO *)malloc(sizeof(CLIENT_INFO));
+	client_info->socket_fd = connect_init();
+	uloop_ufd_add(client_info->socket_fd);
+
+}
+
 static void cleanup_env(){
 	
-	close(socket_fd);
+	close(client_info->socket_fd);
 	
 
 }
-void for_input (  )
+void client_for_input (  )
 {
 	char message[128] = {0};
 	fgets(message,sizeof(message),stdin);
@@ -102,14 +102,13 @@ int main(int argc ,char **argv)
 {
 
 	uloop_init();
-	server_init();
-	uloop_fd_init();
-	signal(SIGIO,for_input);
+	client_init();
+	signal(SIGIO, client_for_input);
 	enable_kdb_signals();//设置输入时发送信号，设置输入为O_ASYNC
+	
 	uloop_run();
 
 	uloop_done();
-	
 	cleanup_env();
 
 	return 0;
