@@ -1,8 +1,6 @@
 
 #include "client.h"
 
-//int socket_fd ;
-//struct uloop_fd ul_fd;
 CLIENT_INFO *client_info;
 static void show_message( const char *msg){
 
