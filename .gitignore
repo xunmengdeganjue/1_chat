@@ -1,6 +1,6 @@
 # Target
-./client
-./server
+*client
+*server
 # Prerequisites
 *.d
 # Object files
