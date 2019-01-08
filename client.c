@@ -52,10 +52,12 @@ static int connect_init(){
 	} 
 	/*配置socket*/
 	bzero(&addr, sizeof(addr)); 
-	addr.sin_family = AF_INET;  /*设置成IP通信*/
-	addr.sin_port = htons(CON_PORT);  /*设置服务器端口号*/
+	addr.sin_family = AF_INET;  		/*设置成IP通信*/
+	addr.sin_port = htons(CON_PORT);  	/*设置服务器端口号*/
 	addr.sin_addr.s_addr = INADDR_ANY;  /*设置服务器IP，INADDR_ANY表示使用本地IP地址，系统会自动填充本地IP地址；
-	  也可以这样设置目标服务器IP地址 addr.sin_addr.s_addr = inet_addr("127.0.0.1");*/
+	  									也可以这样设置目标服务器IP地址 addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	  									使用inet_addr需要包含头文件<arpa/inet.h>，这样可以使不同宿主上的client、server
+	  									通信。*/
 
 	/*将客户端套接字绑定到服务器IP上去*/
 	if(connect(socket_fd, (struct sockaddr*)&addr, sizeof(addr)) == -1)  
@@ -75,7 +77,8 @@ static void client_init(){
 static void cleanup_env(){
 	
 	close(client_info->socket_fd);
-	
+	uloop_fd_delete(&client_info->ulfd);
+	free(client_info);
 
 }
 void client_for_input (  )

@@ -123,6 +123,8 @@ void enable_kdb_signals()
 
 void clean_up(){
 	close(server_info->socket_fd);
+	uloop_fd_delete(&server_info->client_accfd);
+	free(server_info);
 }
 int main(int argc ,char **argv)
 {
